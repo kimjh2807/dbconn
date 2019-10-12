@@ -1,0 +1,148 @@
+
+SELECT *
+FROM tb_education_level;
+
+# 재직여부 구분
+SELECT *
+FROM tb_employment_status;
+
+# user total
+SELECT *
+FROM tb_user;
+-- 146,845명
+
+SELECT COUNT(id), id
+FROM tb_user
+GROUP BY id
+ORDER BY COUNT(id) DESC;
+-- id가 중복(2개)인 회원이 있음
+
+# id 중복(2개)인 회원 확인
+SELECT *
+FROM tb_user
+WHERE id = 'Jinwon96801@naver.com';
+-- 대소문자를 구분하지 않음
+
+# 성별
+SELECT id, name, gender_code, COUNT(*)
+FROM tb_user
+WHERE gender_code IS NULL;
+-- 성별 코드 값이 없는 회원이 있음, 696명
+
+# 성별 코드 값이 있는 회원만
+SELECT *
+FROM tb_user
+WHERE gender_code IS NOT NULL;
+-- 146,149명
+
+# 남녀
+SELECT gender_code, COUNT(gender_code)
+FROM tb_user
+WHERE gender_code IS NOT NULL
+GROUP BY gender_code;
+-- 1 107657
+-- 2 37600
+-- 3 892
+
+# 재직여부(employment_status_code)
+SELECT employment_status_code, COUNT(employment_status_code)
+FROM tb_user
+WHERE employment_status_code IS NOT NULL
+GROUP BY employment_status_code;
+-- 10	40663	무직
+-- 11	15011	구직자
+-- 20	17169	재직자(소기업)	
+-- 21	19978	재직자(중소기업)
+-- 22	13297	재직자(중견기업)
+-- 23	20232	재직자(대기업)
+-- 29	913		재직자(알수없음)
+-- total	127263
+
+# 회사명
+SELECT company_name, COUNT(company_name)
+FROM tb_user
+WHERE company_name IS NOT NULL
+GROUP BY company_name
+ORDER BY COUNT(company_name) DESC;
+-- 없음	11601
+-- 삼성디스플레이	1877
+-- 한국철도공사	1534
+-- (주)삼성디스플레이	1517
+-- 베스트윈	1290
+-- 마산대학교	1204
+-- 동부대우전자	1002
+-- 네패스	918
+-- 유라코퍼레이션	895
+-- ABB코리아	765
+-- 세메스	739
+-- 한국기술교육대학교	726
+-- 에이치티엠	725
+-- 에스에프에이	681
+-- ㈜삼성디스플레이	644
+-- 피엔씨텍	598
+-- 삼성전자	587
+-- 공통역량	544
+-- kt	482
+-- 인천교통공사	369
+-- 창원_컴퓨터응용기계과	312
+-- 아이씨디	305
+
+# 학력
+SELECT education_level_code, COUNT(education_level_code)
+FROM tb_user
+WHERE education_level_code IS NOT NULL
+GROUP BY education_level_code;
+-- 1	2692	박사
+-- 2	7665	석사
+-- 3	34212	학사
+-- 4	10499	전문대
+-- 5	19308	고등학교
+-- 9	4447	기타
+-- total	78823
+
+# 생년월일
+SELECT COUNT(*),
+	CASE WHEN date_of_birth > 1998-01-01 THEN '10대'
+		 WHEN date_of_birth > 1988-01-01 THEN '20대'
+         WHEN date_of_birth > 1978-01-01 THEN '30대'
+         WHEN date_of_birth > 1968-01-01 THEN '40대'
+         WHEN date_of_birth > 1958-01-01 THEN '50대'
+         ELSE '60대' 
+	END AS Age
+FROM tb_user
+GROUP BY Age;
+-- 18633	10대
+-- 52906	20대
+-- 37895	30대
+-- 24798	40대
+-- 10087	50대
+-- 2526		60대
+
+# 집 주소
+SELECT id, name, address_1
+FROM tb_user
+WHERE address_1 NOT IN('');
+-- 76246
+
+# 탈퇴회원, 탈퇴이유
+SELECT is_delete_requested, delete_requested_date, delete_reason
+FROM tb_user
+WHERE is_delete_requested = 1;
+-- 367
+-- 텍스트 분석
+
+# 가입일, 년월일시분초 -> 년월일
+SELECT CAST(registered_date AS DATE) AS Regdate, COUNT(id)
+FROM tb_user
+GROUP BY Regdate
+ORDER BY COUNT(id) DESC;
+
+# 2019-09 가입회원 정보, 폴리텍, 아이디, 이메일 등이 이상함
+SELECT *
+FROM tb_user
+WHERE idx > 1263488 AND company_name LIKE '%과';
+
+# 폴리텍 가입 관리자
+SELECT *
+FROM tb_user
+WHERE idx = 1264304 OR idx = 124899;
